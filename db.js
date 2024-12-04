@@ -8,4 +8,4 @@ const db = new Sequelize({
   host: "127.0.0.1",
 });
 
-module.exports = { db };
+module.exports = {};
