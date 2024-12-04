@@ -1,0 +1,21 @@
+{
+  "name": "translate_bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "db": "npx sequelize-cli db:create --config ./src/configSequelize.js",
+    "migrate": "npx sequelize-cli db:migrate --config ./src/configSequelize.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv-cli": "^7.4.4",
+    "express": "^4.21.1",
+    "mysql2": "^3.11.5",
+    "node-telegram-bot-api": "^0.66.0",
+    "sequelize": "^6.37.5",
+    "sequelize-cli": "^6.6.2"
+  }
+}
