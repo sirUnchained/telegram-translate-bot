@@ -8,4 +8,13 @@ const db = new Sequelize({
   host: "127.0.0.1",
 });
 
+(async function () {
+  try {
+    await db.authenticate();
+    console.log("db connected.");
+  } catch (error) {
+    throw error;
+  }
+})();
+
 module.exports = { db };
