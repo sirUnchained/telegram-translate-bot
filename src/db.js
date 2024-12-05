@@ -10,6 +10,8 @@ const db = new Sequelize({
   logging: false,
 });
 
+const userModel = require("./models/user.model")(db);
+
 (async function () {
   try {
     await db.authenticate();
@@ -19,4 +21,4 @@ const db = new Sequelize({
   }
 })();
 
-module.exports = { db };
+module.exports = { db, userModel };

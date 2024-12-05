@@ -1,8 +1,39 @@
 const translationEngineOptions = require("../components/translationEngineOptions");
+const { userModel } = require("../db");
+const path = require("path");
+const fs = require("fs");
 
 const redis = require("./../redis");
 
-const sendWelcomMsg = async (bot, chatID) => {
+const sendWelcomMsg = async (bot, chatID, currentUser) => {
+  const searchForUser = await userModel.findOne({
+    where: {
+      chatID: String(chatID),
+    },
+    raw: true,
+  });
+  if (!searchForUser) {
+    await userModel.create({
+      fullname: currentUser.first_name,
+      username: currentUser.username || null,
+      chatID: String(chatID),
+    });
+
+    if (
+      fs.existsSync(
+        path.join(__dirname, "../../public/so_welcome_new_user.mp4")
+      )
+    ) {
+      await bot.sendVideo(
+        chatID,
+        path.join(__dirname, "../../public/so_welcome_new_user.mp4"),
+        {
+          caption: "خوش اومدی کاربر جدید.",
+        }
+      );
+    }
+  }
+
   await bot.sendMessage(
     chatID,
     "به ربات ترجمه خوش امدید.",

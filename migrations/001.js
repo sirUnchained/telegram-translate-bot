@@ -2,18 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("messages", {
+    await queryInterface.createTable("users", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER.UNSIGNED,
+        type: Sequelize.INTEGER,
       },
-      chat_id: {
-        type: Sequelize.STRING(25),
+      fullname: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
       },
-      message: {
-        type: Sequelize.STRING,
+      username: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      chatID: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

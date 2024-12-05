@@ -1,5 +1,5 @@
 const telBot = require("node-telegram-bot-api");
-const { db } = require("./db");
+require("./db");
 
 // actions
 const {
@@ -22,14 +22,13 @@ const currentLanguages = ["fa", "en", "fa_en", "en_fa"];
 
 bot.onText(/\/start/, async (msg) => {
   const chatID = msg.chat.id;
-  await sendWelcomMsg(bot, chatID);
+  await sendWelcomMsg(bot, chatID, msg.from);
 });
 
 bot.on("callback_query", async (query) => {
   const selectedCommand = query.data;
   const chatID = query.message.chat.id;
   const messageID = query.message.message_id;
-  console.log(query);
 
   if (currentTranslationEngines.includes(selectedCommand)) {
     await sendTranslateKeyword(
@@ -99,25 +98,3 @@ bot.on("message", async (msg) => {
 bot.on("error", (error) => {
   console.log("we have an error =>", error);
 });
-/*
-{
-https://api.one-api.ir/translate/v1
-
-  message_id: 174,
-  from: {
-    id: 6567790998,
-    is_bot: false,
-    first_name: 'B',
-    username: 'sirUnchained',
-    language_code: 'en'
-  },
-  chat: {
-    id: 6567790998,
-    first_name: 'B',
-    username: 'sirUnchained',
-    type: 'private'
-  },
-  date: 1733386074,
-  text: 'hello'
-}
-*/
