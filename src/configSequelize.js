@@ -1,7 +1,9 @@
+require("dotenv").config();
+
 module.exports = {
-  username: "root",
-  password: "",
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
   database: "telegram_translate",
   host: "127.0.0.1",
-  dialect: "mysql",
+  dialect: process.env.DB_DIALECT,
 };
