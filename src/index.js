@@ -1,16 +1,21 @@
 const telBot = require("node-telegram-bot-api");
 const { db } = require("./db");
+
 // actions
 const {
   sendWelcomMsg,
   sendTranslateKeyword,
   sendLanguage,
+  backToChosenEngine,
 } = require("./actions/action");
+
 // components
 const translationOptions = require("./components/translationOptions");
-const list = require("./components/messages");
+const redis = require("./redis");
+
 // bot settings
 const botToken = process.env.BOT_TOKEN;
+const api_token = process.env.API_TOKEN;
 const bot = new telBot(botToken, { polling: true });
 const currentTranslationEngines = ["google", "microsoft", "yandex"];
 const currentLanguages = ["fa", "en", "fa_en", "en_fa"];
@@ -24,13 +29,13 @@ bot.on("callback_query", async (query) => {
   const selectedCommand = query.data;
   const chatID = query.message.chat.id;
   const messageID = query.message.message_id;
+  console.log(query);
 
   if (currentTranslationEngines.includes(selectedCommand)) {
     await sendTranslateKeyword(
       bot,
       chatID,
       messageID,
-      "action",
       selectedCommand,
       translationOptions[`${selectedCommand}LanguageOptions`],
       `شما موتور ترجمه ${selectedCommand} را انتخاب کردید \n حالا زبان مورد نظر خود را انتخاب کنید:`
@@ -43,17 +48,77 @@ bot.on("callback_query", async (query) => {
       "حالا متن مورد نظر خود را ارسال کنید:"
     );
   }
+
+  bot.editMessageText();
+
+  if (query.data === "BACK_TO_CHOSE_ENGINE") {
+    await backToChosenEngine(bot, chatID, messageID, translationOptions);
+  }
 });
 
 bot.on("message", async (msg) => {
   const chatID = msg.chat.id;
+  const userMsg = msg.text;
 
-  if (!msg.text.startsWith("/")) {
-    console.log(msg.text);
-    await bot.sendMessage(chatID, "i saved you'r message !");
+  if (!userMsg.startsWith("/")) {
+    const action = await redis.get(`user-${chatID}:action`);
+    const language = await redis.get(`user-${chatID}:lang`);
+    console.log(action, language);
+
+    if (action && language) {
+      const response = await fetch(
+        `https://api.one-api.ir/translate/v1/${action}`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "one-api-token": api_token,
+          },
+          body: JSON.stringify({
+            source: "fa",
+            target: language,
+            text: userMsg,
+          }),
+        }
+      );
+      const result = await response.json();
+
+      if (result.status == 200) {
+        await bot.sendMessage(chatID, result.result);
+      } else {
+        await bot.sendMessage(
+          chatID,
+          "ترجمه شکست خورد چون که سرویس با خط مواجه شده."
+        );
+      }
+    } else {
+      await sendWelcomMsg(bot, chatID);
+    }
   }
 });
 
 bot.on("error", (error) => {
   console.log("we have an error =>", error);
 });
+/*
+{
+https://api.one-api.ir/translate/v1
+
+  message_id: 174,
+  from: {
+    id: 6567790998,
+    is_bot: false,
+    first_name: 'B',
+    username: 'sirUnchained',
+    language_code: 'en'
+  },
+  chat: {
+    id: 6567790998,
+    first_name: 'B',
+    username: 'sirUnchained',
+    type: 'private'
+  },
+  date: 1733386074,
+  text: 'hello'
+}
+*/

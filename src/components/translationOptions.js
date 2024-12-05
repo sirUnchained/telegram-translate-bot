@@ -5,7 +5,7 @@ const googleLanguageOptions = {
         { text: "انگلیسی", callback_data: "en" },
         { text: "فارسی", callback_data: "fa" },
       ],
-      [{ text: "بازگشت", callback_data: "back" }],
+      [{ text: "بازگشت", callback_data: "BACK_TO_CHOSE_ENGINE" }],
     ],
   },
 };
@@ -17,7 +17,7 @@ const microsoftLanguageOptions = {
         { text: "انگلیسی", callback_data: "en" },
         { text: "فارسی", callback_data: "fa" },
       ],
-      [{ text: "بازگشت", callback_data: "back" }],
+      [{ text: "بازگشت", callback_data: "BACK_TO_CHOSE_ENGINE" }],
     ],
   },
 };
@@ -29,7 +29,7 @@ const yandexLanguageOptions = {
         { text: "انگلیسی", callback_data: "en" },
         { text: "فارسی", callback_data: "fa" },
       ],
-      [{ text: "بازگشت", callback_data: "back" }],
+      [{ text: "بازگشت", callback_data: "BACK_TO_CHOSE_ENGINE" }],
     ],
   },
 };
