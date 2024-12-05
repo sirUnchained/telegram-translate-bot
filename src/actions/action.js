@@ -34,14 +34,18 @@ const sendTranslateKeyword = async (
   });
 };
 
-const sendLanguage = async (bot, chatID, lang, message) => {
+const reciveUserText = async (bot, chatID, messageID, lang, message) => {
   await redis.set(`user-${chatID}:lang`, lang, "EX", 3 * 60);
-  await bot.sendMessage(chatID, message);
+  // console.log(chatID, messageID, lang, message);
+  await bot.editMessageText(message, {
+    chat_id: chatID,
+    message_id: messageID,
+  });
 };
 
 module.exports = {
   sendWelcomMsg,
   sendTranslateKeyword,
-  sendLanguage,
+  reciveUserText,
   backToChosenEngine,
 };

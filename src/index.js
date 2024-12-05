@@ -5,8 +5,8 @@ const { db } = require("./db");
 const {
   sendWelcomMsg,
   sendTranslateKeyword,
-  sendLanguage,
   backToChosenEngine,
+  reciveUserText,
 } = require("./actions/action");
 
 // components
@@ -41,15 +41,14 @@ bot.on("callback_query", async (query) => {
       `شما موتور ترجمه ${selectedCommand} را انتخاب کردید \n حالا زبان مورد نظر خود را انتخاب کنید:`
     );
   } else if (currentLanguages.includes(selectedCommand)) {
-    await sendLanguage(
+    await reciveUserText(
       bot,
       chatID,
+      messageID,
       selectedCommand,
       "حالا متن مورد نظر خود را ارسال کنید:"
     );
   }
-
-  bot.editMessageText();
 
   if (query.data === "BACK_TO_CHOSE_ENGINE") {
     await backToChosenEngine(bot, chatID, messageID, translationOptions);
