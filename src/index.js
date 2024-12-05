@@ -1,16 +1,19 @@
 const telBot = require("node-telegram-bot-api");
 const { db } = require("./db");
 // actions
-const { sendWelcomMsg, sendTranslateKeyword } = require("./actions/action");
-// components
 const {
-  googleLanguageOptions,
-  microsoftLanguageOptions,
-  yandexLanguageOptions,
-} = require("./components/components_list");
-
+  sendWelcomMsg,
+  sendTranslateKeyword,
+  sendLanguage,
+} = require("./actions/action");
+// components
+const translationOptions = require("./components/translationOptions");
+const list = require("./components/messages");
+// bot settings
 const botToken = process.env.BOT_TOKEN;
 const bot = new telBot(botToken, { polling: true });
+const currentTranslationEngines = ["google", "microsoft", "yandex"];
+const currentLanguages = ["fa", "en", "fa_en", "en_fa"];
 
 bot.onText(/\/start/, async (msg) => {
   const chatID = msg.chat.id;
@@ -22,48 +25,35 @@ bot.on("callback_query", async (query) => {
   const chatID = query.message.chat.id;
   const messageID = query.message.message_id;
 
-  console.log("query =>", query.data);
-
-  if (selectedCommand == "google") {
+  if (currentTranslationEngines.includes(selectedCommand)) {
     await sendTranslateKeyword(
       bot,
       chatID,
       messageID,
       "action",
       selectedCommand,
-      googleLanguageOptions,
-      "حالا زبان مورد نظر خود را انتخاب کن:"
+      translationOptions[`${selectedCommand}LanguageOptions`],
+      `شما موتور ترجمه ${selectedCommand} را انتخاب کردید \n حالا زبان مورد نظر خود را انتخاب کنید:`
     );
-  } else if (selectedCommand == "microsoft") {
-    await sendTranslateKeyword(
+  } else if (currentLanguages.includes(selectedCommand)) {
+    await sendLanguage(
       bot,
       chatID,
-      messageID,
-      "action",
       selectedCommand,
-      googleLanguageOptions,
-      "حالا زبان مورد نظر خود را انتخاب کن:"
+      "حالا متن مورد نظر خود را ارسال کنید:"
     );
-  } else if (selectedCommand == "yandex") {
-    await sendTranslateKeyword(
-      bot,
-      chatID,
-      messageID,
-      "action",
-      selectedCommand,
-      googleLanguageOptions,
-      "حالا زبان مورد نظر خود را انتخاب کن:"
-    );
-  }
-
-  if (selectedCommand == "fa") {
-    bot.sendMessage(chatID, "fa");
-  } else if (selectedCommand == "en") {
-    bot.sendMessage(chatID, "en");
   }
 });
 
-// bot.on("message", async (msg) => {
-//   const chatID = msg.chat.id;
-//   await bot.sendMessage(chatID, "i saved you'r message !");
-// });
+bot.on("message", async (msg) => {
+  const chatID = msg.chat.id;
+
+  if (!msg.text.startsWith("/")) {
+    console.log(msg.text);
+    await bot.sendMessage(chatID, "i saved you'r message !");
+  }
+});
+
+bot.on("error", (error) => {
+  console.log("we have an error =>", error);
+});

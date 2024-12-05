@@ -1,4 +1,4 @@
-const { translationEngineOptions } = require("../components/components_list");
+const translationEngineOptions = require("../components/translationEngineOptions");
 
 const redis = require("./../redis");
 
@@ -19,7 +19,7 @@ const sendTranslateKeyword = async (
   keyboard,
   textMsg
 ) => {
-  await redis.set(`user:${chatID}:${field}`, command);
+  await redis.set(`user:${chatID}:${field}`, command, "EX", 180);
   await bot.editMessageText(textMsg, {
     chat_id: chatID,
     message_id: messageID,
@@ -27,4 +27,9 @@ const sendTranslateKeyword = async (
   });
 };
 
-module.exports = { sendWelcomMsg, sendTranslateKeyword };
+const sendLanguage = async (bot, chatID, lang, message) => {
+  await redis.set(`user-${chatID}:lang`, lang, "EX", 3 * 60);
+  await bot.sendMessage(chatID, message);
+};
+
+module.exports = { sendWelcomMsg, sendTranslateKeyword, sendLanguage };
